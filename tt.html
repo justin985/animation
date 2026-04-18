@@ -64,29 +64,33 @@
         <!-- Main Content Area (Buttons & Info Panel) -->
         <div class="flex justify-between items-end w-full max-w-7xl mx-auto gap-8">
             
-            <!-- Navigation Buttons -->
-            <div class="flex flex-col gap-3 pointer-events-auto w-64">
-                <button onclick="changeView(0)" id="btn-0" class="nav-btn active text-left px-5 py-3 rounded-xl border border-gray-600 bg-gray-800 text-gray-200 font-semibold hover:bg-gray-700">
-                    <span class="text-xl mr-2"></span> 0.全局視角 (Overview)
-                </button>
-                <button onclick="changeView(1)" id="btn-1" class="nav-btn text-left px-5 py-3 rounded-xl border border-gray-600 bg-gray-800 text-gray-200 font-semibold hover:bg-gray-700">
-                    <span class="text-xl mr-2"></span> 1.集熱裝置
-                </button>
-                <button onclick="changeView(2)" id="btn-2" class="nav-btn text-left px-5 py-3 rounded-xl border border-gray-600 bg-gray-800 text-gray-200 font-semibold hover:bg-gray-700">
-                    <span class="text-xl mr-2"></span> 2.運輸管線
-                </button>
-                <button onclick="changeView(3)" id="btn-3" class="nav-btn text-left px-5 py-3 rounded-xl border border-gray-600 bg-gray-800 text-gray-200 font-semibold hover:bg-gray-700">
-                    <span class="text-xl mr-2"></span> 3.儲存工具
-                </button>
-                <button onclick="changeView(4)" id="btn-4" class="nav-btn text-left px-5 py-3 rounded-xl border border-gray-600 bg-gray-800 text-gray-200 font-semibold hover:bg-gray-700">
-                    <span class="text-xl mr-2"></span> 4.放熱裝置
-                </button>
+            <!-- Navigation Control Panel (Merged) -->
+            <div class="glass-panel rounded-2xl p-5 pointer-events-auto w-72 flex flex-col items-center justify-center gap-4 border-l-4 border-l-blue-500">
+                <div class="text-gray-400 text-sm font-semibold tracking-wider">視角切換控制</div>
+                <div class="flex items-center justify-between w-full">
+                    <button onclick="prevView()" class="p-2 rounded-full hover:bg-white/10 transition-colors text-white focus:outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                    </button>
+                    <div id="current-view-name" class="text-xl font-bold text-blue-400 text-center flex-1">
+                        全局視角
+                    </div>
+                    <button onclick="nextView()" class="p-2 rounded-full hover:bg-white/10 transition-colors text-white focus:outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                    </button>
+                </div>
+                <!-- Pagination dots -->
+                <div class="flex gap-2 mt-2" id="pagination-dots">
+                    <div class="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)] transition-colors duration-300"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-gray-600 transition-colors duration-300"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-gray-600 transition-colors duration-300"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-gray-600 transition-colors duration-300"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-gray-600 transition-colors duration-300"></div>
+                </div>
             </div>
 
             <!-- Info Panel -->
             <div id="info-panel" class="glass-panel rounded-2xl p-6 pointer-events-auto flex-1 max-w-xl transition-all duration-300">
                 <div class="flex items-center gap-3 mb-3">
-                    <span id="info-icon" class="text-4xl">🌐</span>
                     <h2 id="info-title" class="text-2xl font-bold text-white">系統總覽</h2>
                 </div>
                 <div class="h-px w-full bg-gradient-to-r from-gray-500 to-transparent mb-4"></div>
@@ -192,11 +196,12 @@
         houseRight.castShadow = true; houseRight.receiveShadow = true;
         houseGroup.add(houseRight);
 
-        // Roof
-        const roofGeo = new THREE.ConeGeometry(7.5, 3, 4);
+        // Roof (Fixed alignment: scaled to perfectly cover the 12x8 rectangular house base)
+        const roofGeo = new THREE.ConeGeometry(Math.SQRT1_2, 1, 4);
+        roofGeo.rotateY(Math.PI / 4); // Align base with axes
+        roofGeo.scale(13, 3, 9); // Scale to width: 13, height: 3, depth: 9 (creating a slight overhang)
         const roof = new THREE.Mesh(roofGeo, materials.roof);
-        roof.position.set(0, 7.5, 0);
-        roof.rotation.y = Math.PI / 4;
+        roof.position.set(0, 7.5, 0); // Wall height 6 + half roof height 1.5
         roof.castShadow = true;
         houseGroup.add(roof);
 
@@ -386,49 +391,72 @@
         // --- 5. UI Data & Interaction ---
         const contentData = [
             {
-                title: "系統總覽", icon: "🌐",
+                shortName: "全局視角",
+                title: "系統總覽",
                 desc: "這是一個跨季節的熱能調度系統。利用建築物夏季空調排出的廢熱，將其儲存於地下的相變材料或水槽中。到了冬季，熱泵再將這些儲存的熱能提取出來，用於室內地暖與衛浴熱水，達到極致的能源互補。",
                 tags: ["循環系統", "節能減碳", "冷熱調適"]
             },
             {
-                title: "1. 集熱裝置", icon: "☀️",
+                shortName: "集熱裝置",
+                title: "1. 集熱裝置",
                 desc: "在夏季冷氣運行模式下，室內的熱量被冷媒帶走。傳統空調會將這些廢熱直接排向街道造成熱島效應，但此系統透過集熱裝置，將高溫冷媒排出的熱量進行攔截與回收。",
                 tags: ["廢熱回收", "冷氣降溫", "熱交換"]
             },
             {
-                title: "2. 運輸管線", icon: "🛤️",
+                shortName: "運輸管線",
+                title: "2. 運輸管線",
                 desc: "攔截下來的熱量，透過佈建於牆體或土壤層中的循環水系統（或冷媒管線）向下運輸。管線具備良好的保溫層，確保熱能在傳輸過程中不會散失，精準送達地底。",
                 tags: ["循環水系統", "土壤層", "低損耗傳輸"]
             },
             {
-                title: "3. 儲存工具", icon: "🔋",
+                shortName: "儲存工具",
+                title: "3. 儲存工具",
                 desc: "地底設有專門的「熱能儲存槽」（可為水槽或填充相變材料）。夏季源源不絕的廢熱在此轉化為潛熱儲存起來。利用地底恆溫的特性，這座天然的保溫瓶能將熱能保存數月之久。",
                 tags: ["地熱儲存", "相變材料 (PCM)", "跨季節儲能"]
             },
             {
-                title: "4. 放熱裝置", icon: "❄️",
+                shortName: "放熱裝置",
+                title: "4. 放熱裝置",
                 desc: "冬季寒流來襲時，室外熱泵逆向運行。它不再消耗大量電力製熱，而是直接從地底儲存槽提取「夏季存下來的熱量」，將其升溫後供應給室內的地暖系統與衛浴熱水器。",
                 tags: ["熱泵逆向", "室內地暖", "衛浴熱水"]
             }
         ];
 
-        // Expose function to global scope for HTML buttons
+        let currentViewIndex = 0;
+
+        window.prevView = function() {
+            currentViewIndex = (currentViewIndex - 1 + 5) % 5;
+            changeView(currentViewIndex);
+        };
+
+        window.nextView = function() {
+            currentViewIndex = (currentViewIndex + 1) % 5;
+            changeView(currentViewIndex);
+        };
+
         window.changeView = function(index) {
+            currentViewIndex = index;
+
             // Update Camera Targets
             targetCamPos.copy(views[index].pos);
             targetLookAt.copy(views[index].look);
 
-            // Update UI Button states
-            for(let i=0; i<=4; i++) {
-                document.getElementById(`btn-${i}`).classList.remove('active');
+            // Update Control Panel UI (Name and Dots)
+            document.getElementById('current-view-name').innerText = contentData[index].shortName;
+            
+            const dots = document.getElementById('pagination-dots').children;
+            for(let i=0; i<5; i++) {
+                if(i === index) {
+                    dots[i].className = 'w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)] transition-colors duration-300';
+                } else {
+                    dots[i].className = 'w-2.5 h-2.5 rounded-full bg-gray-600 transition-colors duration-300';
+                }
             }
-            document.getElementById(`btn-${index}`).classList.add('active');
 
             // Update Info Panel DOM
             const panel = document.getElementById('info-panel');
             const title = document.getElementById('info-title');
             const desc = document.getElementById('info-desc');
-            const icon = document.getElementById('info-icon');
             const tagsBox = document.getElementById('info-tags');
 
             // Trigger animation re-flow
@@ -437,7 +465,6 @@
             panel.classList.add('fade-in');
 
             const data = contentData[index];
-            icon.innerText = data.icon;
             title.innerText = data.title;
             desc.innerText = data.desc;
             
