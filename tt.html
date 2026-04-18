@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>冷熱互補系統</title>
-    <!-- Tailwind CSS -->
+    <title>社區級冷熱能互補系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         body { margin: 0; overflow: hidden; background-color: #0f172a; font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; }
@@ -55,7 +53,6 @@
             transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
             z-index: 1;
         }
-        /* 季節顏色修正：夏季偏熱(紅橘)、冬季偏冷(藍) */
         .slider-summer { background: linear-gradient(135deg, #ef4444, #f97316); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5); transform: translateX(0); }
         .slider-winter { background: linear-gradient(135deg, #3b82f6, #06b6d4); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5); transform: translateX(100%); }
 
@@ -65,18 +62,14 @@
 </head>
 <body>
 
-    <!-- 3D Canvas -->
     <div id="canvas-container"></div>
 
-    <!-- UI Overlay -->
     <div id="ui-layer">
         
-        <!-- Top Header & Toggle (精簡版) -->
         <header class="absolute top-6 left-0 w-full flex flex-col items-center gap-3 pointer-events-none z-20">
             <div class="glass-panel rounded-full px-6 py-2.5 flex items-center gap-6 pointer-events-auto border-t-2 border-white/20">
-                <h1 class="text-xl font-bold text-white tracking-wide m-0">地熱儲存循環系統</h1>
+                <h1 class="text-xl font-bold text-white tracking-wide m-0">Thermal Link 社區熱網</h1>
                 
-                <!-- Season Toggle -->
                 <div class="season-toggle w-56">
                     <div id="toggle-slider" class="toggle-slider slider-summer"></div>
                     <div onclick="setSeason('summer')" id="btn-summer" class="toggle-btn active-summer">☀️ 夏季</div>
@@ -84,30 +77,25 @@
                 </div>
             </div>
             
-            <!-- 水流圖例 -->
             <div class="flex justify-center gap-5 text-xs font-medium text-gray-300 glass-panel px-4 py-1.5 rounded-full pointer-events-auto">
-                <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444]"></span> 高溫熱能傳輸</span>
-                <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_#3b82f6]"></span> 低溫冷卻迴水</span>
+                <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444]"></span> 潛熱傳輸 (高溫)</span>
+                <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_#3b82f6]"></span> 循環水回流 (低溫)</span>
             </div>
         </header>
 
-        <!-- Main Content Area (Buttons & Info Panel) -->
         <div class="absolute bottom-8 left-0 w-full px-8 flex justify-between items-end max-w-7xl mx-auto left-1/2 transform -translate-x-1/2 gap-8 pointer-events-none">
             
-            <!-- Navigation Control Panel -->
             <div class="glass-panel rounded-2xl p-5 pointer-events-auto w-80 flex flex-col items-center justify-center gap-4 border-l-4" id="nav-panel">
-                <div class="text-gray-400 text-xs font-semibold tracking-wider">視角與狀態</div>
+                <div class="text-gray-400 text-xs font-semibold tracking-wider">系統架構解析</div>
                 <div class="flex items-center justify-between w-full gap-2">
                     <button onclick="prevView()" class="p-1.5 rounded-full hover:bg-white/10 transition-colors text-white focus:outline-none shrink-0">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
                     </button>
-                    <!-- 合併標題於此處 -->
                     <div id="current-view-name" class="text-lg font-bold text-white text-center leading-tight">全局視角</div>
                     <button onclick="nextView()" class="p-1.5 rounded-full hover:bg-white/10 transition-colors text-white focus:outline-none shrink-0">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                     </button>
                 </div>
-                <!-- Pagination dots -->
                 <div class="flex gap-2 mt-1" id="pagination-dots">
                     <div class="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]"></div>
                     <div class="w-2 h-2 rounded-full bg-gray-600"></div>
@@ -117,12 +105,10 @@
                 </div>
             </div>
 
-            <!-- Info Panel (精簡標題) -->
-            <div id="info-panel" class="glass-panel rounded-2xl p-6 pointer-events-auto flex-1 max-w-xl transition-all duration-300 flex flex-col justify-center min-h-[140px]">
-                <p id="info-desc" class="text-gray-200 text-base md:text-lg leading-relaxed m-0">
+            <div id="info-panel" class="glass-panel rounded-2xl p-6 pointer-events-auto flex-1 max-w-xl transition-all duration-300 flex flex-col justify-center min-h-[160px]">
+                <p id="info-desc" class="text-gray-200 text-base md:text-[17px] leading-relaxed m-0">
                     載入中...
                 </p>
-                <!-- Dynamic Tags -->
                 <div id="info-tags" class="mt-4 flex gap-2 flex-wrap"></div>
             </div>
         </div>
@@ -154,7 +140,6 @@
         dirLight.shadow.mapSize.height = 2048;
         scene.add(dirLight);
 
-        // Dynamic lights for interior and tank
         const interiorLight = new THREE.PointLight(0x3b82f6, 1.5, 15);
         interiorLight.position.set(0, 3, 0);
         scene.add(interiorLight);
@@ -171,7 +156,7 @@
             ground: new THREE.MeshStandardMaterial({ color: 0x292524, transparent: true, opacity: 0.9, roughness: 1 }),
             pipeHot: new THREE.MeshStandardMaterial({ color: 0xef4444, metalness: 0.5, roughness: 0.2 }),
             pipeCold: new THREE.MeshStandardMaterial({ color: 0x3b82f6, metalness: 0.5, roughness: 0.2 }),
-            tankShell: new THREE.MeshPhysicalMaterial({ color: 0xfde047, transparent: true, opacity: 0.4, roughness: 0.2, metalness: 0.1 }),
+            tankShell: new THREE.MeshPhysicalMaterial({ color: 0xeab308, transparent: true, opacity: 0.3, roughness: 0.2, metalness: 0.1 }), // PCM Honeycomb outer
             tankCore: new THREE.MeshStandardMaterial({ color: 0x3b82f6, emissive: 0x1e3a8a, emissiveIntensity: 0.5 }),
             deviceWhite: new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3, metalness: 0.2 }),
             deviceGray: new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.5, metalness: 0.5 }),
@@ -181,7 +166,6 @@
         const systemGroup = new THREE.Group();
         scene.add(systemGroup);
 
-        // A. Ground & Grid
         const ground = new THREE.Mesh(new THREE.BoxGeometry(40, 8, 20), materials.ground);
         ground.position.set(0, -4, 0);
         ground.receiveShadow = true;
@@ -193,26 +177,21 @@
         grid.material.transparent = true;
         systemGroup.add(grid);
 
-        // B. Central House (修復 Z-fighting 問題)
+        // House
         const houseGroup = new THREE.Group();
-        
-        // Back wall
         const backWall = new THREE.Mesh(new THREE.BoxGeometry(14, 7, 0.5), materials.houseWall);
-        backWall.position.set(0, 3.5, -3.25); // 稍微往後移避免閃爍
+        backWall.position.set(0, 3.5, -3.25);
         backWall.receiveShadow = true;
         houseGroup.add(backWall);
 
-        // Interior Space (縮小深度以確保不與背牆重疊)
         const interiorWall = new THREE.Mesh(new THREE.BoxGeometry(13.6, 6.6, 5.4), materials.houseInterior);
         interiorWall.position.set(0, 3.4, -0.2); 
         houseGroup.add(interiorWall);
 
-        // Divider
         const divider = new THREE.Mesh(new THREE.BoxGeometry(0.2, 7, 6), materials.houseWall);
         divider.position.set(0, 3.5, -0.25);
         houseGroup.add(divider);
 
-        // Roof
         const roofGeo = new THREE.ConeGeometry(Math.SQRT1_2, 1, 4);
         roofGeo.rotateY(Math.PI / 4);
         roofGeo.scale(15, 3, 8);
@@ -220,25 +199,19 @@
         roof.position.set(0, 8.5, 0);
         roof.castShadow = true;
         houseGroup.add(roof);
-
         systemGroup.add(houseGroup);
 
-        // C. Left System: AC Outdoor Unit (更像冷氣外機)
+        // C. Left: Energy Capture (Water-Cooled AC Node)
         function createAC() {
             const grp = new THREE.Group();
             const body = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.6, 1), materials.deviceWhite);
             body.castShadow = true;
-            
-            // 正面風扇網罩
             const fanGeo = new THREE.CylinderGeometry(0.6, 0.6, 1.05, 32);
             const fan = new THREE.Mesh(fanGeo, materials.fanBlack);
             fan.rotation.x = Math.PI/2;
-            fan.position.set(0.4, 0, 0); // 偏右側
-            
-            // 側面散熱鰭片造型
+            fan.position.set(0.4, 0, 0); 
             const vent = new THREE.Mesh(new THREE.BoxGeometry(0.6, 1.2, 1.05), materials.deviceGray);
             vent.position.set(-0.6, 0, 0);
-
             grp.add(body, fan, vent);
             return grp;
         }
@@ -248,7 +221,6 @@
         acLeft.position.set(-8.5, 2, 0);
         leftSystem.add(acLeft);
 
-        // Heat Exchanger Coils
         const exPoints = [];
         for(let i=0; i<5; i++) {
             exPoints.push(new THREE.Vector3(-10.5 + i*0.4, 0, 0));
@@ -263,38 +235,32 @@
         systemGroup.add(leftSystem);
 
 
-        // D. Right System: Heat Pump / Boiler Unit (更像直立暖氣機/熱水模組)
+        // D. Right: Smart Heat Release (Heat Pump + AI Node)
         function createHeater() {
             const grp = new THREE.Group();
-            // 直立箱體
             const body = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.8, 1.4), materials.deviceWhite);
             body.castShadow = true;
-            body.position.y = 0.5; // 加高
+            body.position.y = 0.5; 
             
-            // 控制面板(黑色)
+            // AI Logic Controller Panel
             const panel = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.4), new THREE.MeshBasicMaterial({color: 0x111111}));
             panel.position.set(0, 1.4, 0.71);
-            
-            // 螢幕(發光)
-            const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.15), new THREE.MeshBasicMaterial({color: 0x0ea5e9}));
+            const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.15), new THREE.MeshBasicMaterial({color: 0x10b981})); // Green AI active
             screen.position.set(0, 1.4, 0.72);
-
             grp.add(body, panel, screen);
             return grp;
         }
 
         const rightSystem = new THREE.Group();
         const hpRight = createHeater();
-        hpRight.position.set(8.5, 1.5, 0); // 調整底座高度
+        hpRight.position.set(8.5, 1.5, 0);
         rightSystem.add(hpRight);
 
-        // Indoor Water Heater Tank
         const waterHeater = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 2.5), materials.deviceWhite);
         waterHeater.position.set(4, 2, 0);
         waterHeater.castShadow = true;
         rightSystem.add(waterHeater);
 
-        // Floor Heating Coils
         const fhPoints = [];
         for(let i=0; i<4; i++) {
             fhPoints.push(new THREE.Vector3(1, 0.2, -1.5 + i*0.8));
@@ -308,7 +274,7 @@
         rightSystem.add(fhPipe);
         systemGroup.add(rightSystem);
 
-        // E. [3. 儲存工具] Horizontal Underground Tank
+        // E. Storage: PCM Storage Bank (Honeycomb represented by tank core)
         const tankGroup = new THREE.Group();
         const tankOuter = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 10, 32), materials.tankShell);
         tankOuter.rotation.z = Math.PI / 2;
@@ -321,7 +287,7 @@
         tankGroup.position.set(0, -4, 0);
         systemGroup.add(tankGroup);
 
-        // F. [2. 運輸管線] Pipes connecting left/right to tank
+        // F. Transport Pipes
         function createTube(points, material) {
             const curve = new THREE.CatmullRomCurve3(points);
             const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 30, 0.12, 8, false), material);
@@ -331,10 +297,8 @@
         const flowPathsSummer = [];
         const flowPathsWinter = [];
 
-        // Summer Pipes (Left side)
         const pSL_hot = [ new THREE.Vector3(-9, 0, 0), new THREE.Vector3(-9, -4, 0), new THREE.Vector3(-5, -4, 0) ]; 
         const pSL_cold = [ new THREE.Vector3(-5, -4, 1), new THREE.Vector3(-7.5, -4, 1), new THREE.Vector3(-7.5, 2, 1) ]; 
-        
         const pipeS1 = createTube(pSL_hot, materials.pipeHot);
         const pipeS2 = createTube(pSL_cold, materials.pipeCold);
         leftSystem.add(pipeS1.mesh, pipeS2.mesh);
@@ -342,8 +306,6 @@
         flowPathsSummer.push({ curve: pipeS1.curve, color: 0xff4444, dir: 1 });
         flowPathsSummer.push({ curve: pipeS2.curve, color: 0x4444ff, dir: 1 });
 
-        // Winter Pipes (Right side)
-        // 配合新的 Heater 高度微調連線
         const pWR_hot = [ new THREE.Vector3(5, -4, 0), new THREE.Vector3(7.5, -4, 0), new THREE.Vector3(7.5, 1.5, 0) ]; 
         const pWR_cold = [ new THREE.Vector3(8.5, 1.5, 1), new THREE.Vector3(8.5, -4, 1), new THREE.Vector3(5, -4, 1) ]; 
         const pW_indoorHot = [ new THREE.Vector3(7.5, 1.5, -0.5), new THREE.Vector3(4.5, 2, -0.5) ]; 
@@ -358,7 +320,7 @@
         flowPathsWinter.push({ curve: pipeW3.curve, color: 0xff8800, dir: 1 });
 
 
-        // --- Particle System ---
+        // Particles
         const particlesSummer = [];
         const particlesWinter = [];
         const particleGeo = new THREE.SphereGeometry(0.25, 8, 8);
@@ -377,72 +339,72 @@
         initParticles(flowPathsSummer, particlesSummer);
         initParticles(flowPathsWinter, particlesWinter);
 
-        // --- 4. State Management (Season Toggle) ---
+        // --- 4. Updated Text Data (Based on Thermal Link Concept) ---
         let currentSeason = 'summer';
 
         const textData = {
             summer: [
                 {
-                    title: "系統總覽 (夏季模式)",
-                    desc: "在夏季，系統以「冷氣降溫」為主。左側的空調系統啟動，將室內的熱量抽出，並透過集熱裝置轉移至地下的儲存槽。此時地下儲存槽扮演『吸熱』的角色，溫度逐漸升高。",
-                    tags: ["冷氣運行模式", "廢熱回收", "熱量存入"]
+                    title: "微型熱網節點：冷熱互補原理 (夏)",
+                    desc: "夏季時，將家戶原本要排向街道的空調廢熱攔截，透過智慧節點轉移並儲存至地底。",
+                    tags: ["熱能調度", "熱力學第二定律", "減少熱島效應"]
                 },
                 {
-                    title: "1. 集熱裝置 (夏季啟動)",
-                    desc: "冷氣運行時，冷媒排出的高溫廢熱不再吹向街道，而是導入熱交換器。水循環系統在此將熱量攔截並帶走。",
-                    tags: ["熱交換", "廢熱攔截"]
+                    title: "1. 能量捕捉層：熱交換聯網",
+                    desc: "改變目前家戶獨立排熱的現況。空調室外機不再直接吹向大街，而是連接到「水冷式熱回收管網」。冷媒排出的高溫熱量直接被循環水帶走。",
+                    tags: ["水冷式回收", "COP效率提升", "阻斷廢熱"]
                 },
                 {
-                    title: "2. 運輸管線 (夏季流向)",
-                    desc: "左側紅色的循環水管線將帶有廢熱的高溫水往下傳送至地底；藍色管線則是釋放完熱量後的低溫水，回流至上方繼續冷卻。",
-                    tags: ["高溫向下", "冷卻回流"]
+                    title: "熱網管線：向下傳輸",
+                    desc: "透過聯網管線，帶有空調廢熱的高溫水（紅）被集中送往地底；而釋放完熱量的低溫冷卻水（藍）則重新循環回流至各戶室外機。",
+                    tags: ["水冷管網", "集中傳輸"]
                 },
                 {
-                    title: "3. 儲存工具 (夏季蓄熱)",
-                    desc: "儲存能量之處，原理稍後講解",
-                    tags: ["地下保溫槽", "熱能存入儲備"]
+                    title: "2. 儲能轉化層：PCM 儲能池",
+                    desc: "儲存裝置，等等介紹。",
+                    tags: ["相變材料 PCM", "固態變液態", "潛熱儲存"]
                 },
                 {
-                    title: "4. 放熱裝置 (夏季待機)",
-                    desc: "夏季不需供暖，因此右側的暖氣與衛浴熱水系統處於休眠狀態，確保能源不浪費。",
-                    tags: ["系統待機", "節能模式"]
+                    title: "3. 智慧決策層：動態分配 (夏)",
+                    desc: "在夏季，AI 可將多餘的空調廢熱直接導向正在洗澡的 B 戶進行熱水預熱，或將其存入地底，此時冬季供暖設備處於待機。",
+                    tags: ["AI 演算法", "生活熱水預熱", "動態平衡"]
                 }
             ],
             winter: [
                 {
-                    title: "系統總覽 (冬季模式)",
-                    desc: "進入冬季，系統切換為「供暖模式」。右側的熱泵逆向運行，從地底抽出夏季儲存的熱能，將其升溫後供應給屋內的地暖與熱水。地下儲存槽溫度逐漸下降，準備迎接下一個夏季。",
-                    tags: ["熱泵逆向運行", "冬季採暖", "提取熱量"]
+                    title: "微型熱網節點：跨季取熱原理 (冬)",
+                    desc: "冬季需要大量熱能時，系統將夏季存入地底的「廢熱資產」重新提取。透過冷熱互補，大幅降低冬季對電網取暖的依賴。",
+                    tags: ["跨季儲能", "降低電網負荷", "永續城市"]
                 },
                 {
-                    title: "1. 集熱裝置 (冬季待機)",
-                    desc: "冬季不需冷氣製冷，左側的空調外機與集熱裝置進入休眠待機狀態。",
-                    tags: ["系統待機", "無冷氣需求"]
+                    title: "1. 能量捕捉層：冬季待機",
+                    desc: "冬季不需開啟冷氣製冷，因此左側的空調主機與水冷式熱回收管網進入休眠待機狀態，將運作核心轉移至地底與供暖端。",
+                    tags: ["系統休眠", "節能待機"]
                 },
                 {
-                    title: "2. 運輸管線 (冬季流向)",
-                    desc: "左側管線靜止。右側的橘色管線將地底提取出的溫水向上輸送至熱泵；藍色管線則將降溫後的水送回地底。",
-                    tags: ["溫水向上", "冷卻回流"]
+                    title: "熱網管線：向上提取",
+                    desc: "右側管網啟動。橘色管線將地底釋放的溫水向上抽取至熱泵；降溫後的水（藍）再送回地底吸收潛熱，形成冬季取熱循環。",
+                    tags: ["提取熱能", "冬季取熱循環"]
                 },
                 {
-                    title: "3. 儲存工具 (冬季放熱)",
-                    desc: "儲存能量之處，原理稍後講解",
-                    tags: ["提取熱量", "跨季釋放"]
+                    title: "2. 儲能轉化層：PCM 凝固放熱",
+                    desc: "儲存裝置，等等介紹。",
+                    tags: ["液態變固態", "相變放熱", "潛熱提取"]
                 },
                 {
-                    title: "4. 放熱裝置 (冬季啟動)",
-                    desc: "右側直立式暖氣機組啟動，將地底抽出的熱能轉化為高溫，提供給屋內的「衛浴熱水」以及「室內地暖」Ｓ型管線，達到溫和舒適的無感供暖。",
-                    tags: ["衛浴熱水", "室內地暖", "高效供暖"]
+                    title: "3. 智慧決策層：供暖與預測",
+                    desc: "根據氣象預報模型（如明日寒流），系統提前於低電價時段啟動熱泵逆向運行，將提取的熱量高效率地分配給室內的地暖 S 型管與衛浴熱水系統。",
+                    tags: ["預測模型", "熱泵逆向", "室內地暖"]
                 }
             ]
         };
 
-        // Target colors for interpolation
+        // Colors
         const colors = {
             houseSum: new THREE.Color(0xbfdbfe), // Cool Blue inside
             houseWin: new THREE.Color(0xfed7aa), // Warm Orange inside
-            tankSum: new THREE.Color(0xef4444),  // Tank Hot
-            tankWin: new THREE.Color(0x3b82f6)   // Tank Cold
+            tankSum: new THREE.Color(0xef4444),  // PCM Liquid (Hot)
+            tankWin: new THREE.Color(0x3b82f6)   // PCM Solid (Cold)
         };
 
         let targetHouseColor = colors.houseSum.clone();
@@ -451,7 +413,6 @@
         window.setSeason = function(season) {
             currentSeason = season;
             
-            // UI Toggle Button updates
             const slider = document.getElementById('toggle-slider');
             const btnSum = document.getElementById('btn-summer');
             const btnWin = document.getElementById('btn-winter');
@@ -461,9 +422,8 @@
                 slider.className = 'toggle-slider slider-summer';
                 btnSum.classList.add('active-summer');
                 btnWin.classList.remove('active-winter');
-                navPanel.style.borderLeftColor = '#ef4444'; // Red for Summer toggle
+                navPanel.style.borderLeftColor = '#ef4444';
                 
-                // Colors & Lights
                 targetHouseColor.copy(colors.houseSum);
                 targetTankColor.copy(colors.tankSum);
                 interiorLight.color.setHex(0x3b82f6);
@@ -475,9 +435,8 @@
                 slider.className = 'toggle-slider slider-winter';
                 btnSum.classList.remove('active-summer');
                 btnWin.classList.add('active-winter');
-                navPanel.style.borderLeftColor = '#3b82f6'; // Blue for Winter toggle
+                navPanel.style.borderLeftColor = '#3b82f6';
 
-                // Colors & Lights
                 targetHouseColor.copy(colors.houseWin);
                 targetTankColor.copy(colors.tankWin);
                 interiorLight.color.setHex(0xf97316);
@@ -487,11 +446,10 @@
                 particlesWinter.forEach(p => p.mesh.visible = true);
             }
 
-            // Refresh text for current view
             updateUI(currentViewIndex);
         };
 
-        // --- 5. Camera Views & Navigation ---
+        // Views
         let currentViewIndex = 0;
         let currentCamPos = new THREE.Vector3(0, 5, 26);
         let targetCamPos = new THREE.Vector3(0, 5, 26);
@@ -499,11 +457,11 @@
         let targetLookAt = new THREE.Vector3(0, 0, 0);
 
         const views = [
-            { pos: new THREE.Vector3(0, 3, 26), look: new THREE.Vector3(0, 0, 0) }, // 0: Overview
-            { pos: new THREE.Vector3(-14, 4, 12), look: new THREE.Vector3(-8, 2, 0) }, // 1: Left AC
-            { pos: new THREE.Vector3(-8, -2, 12), look: new THREE.Vector3(-6, -3, 0) }, // 2: Left Pipes
-            { pos: new THREE.Vector3(0, -4, 15), look: new THREE.Vector3(0, -4, 0) },  // 3: Tank
-            { pos: new THREE.Vector3(12, 6, 12), look: new THREE.Vector3(5, 1, 0) }    // 4: Right Indoor/HP
+            { pos: new THREE.Vector3(0, 3, 26), look: new THREE.Vector3(0, 0, 0) }, 
+            { pos: new THREE.Vector3(-14, 4, 12), look: new THREE.Vector3(-8, 2, 0) }, 
+            { pos: new THREE.Vector3(-8, -2, 12), look: new THREE.Vector3(-6, -3, 0) }, 
+            { pos: new THREE.Vector3(0, -4, 15), look: new THREE.Vector3(0, -4, 0) },  
+            { pos: new THREE.Vector3(12, 6, 12), look: new THREE.Vector3(5, 1, 0) }    
         ];
 
         window.prevView = function() {
@@ -518,14 +476,11 @@
 
         function updateUI(index) {
             currentViewIndex = index;
-
-            // Camera Targets
             targetCamPos.copy(views[index].pos);
             targetLookAt.copy(views[index].look);
 
             const data = textData[currentSeason][index];
 
-            // Update Control Panel UI (將大標題移至左側)
             document.getElementById('current-view-name').innerText = data.title;
             
             const dots = document.getElementById('pagination-dots').children;
@@ -535,10 +490,9 @@
                 dots[i].className = i === index ? `w-2 h-2 rounded-full transition-colors duration-300 ${activeColor}` : 'w-2 h-2 rounded-full bg-gray-600 transition-colors duration-300';
             }
 
-            // Update Info Panel DOM (移除原本的 h2 大標題)
             const panel = document.getElementById('info-panel');
             panel.classList.remove('fade-in');
-            void panel.offsetWidth; // trigger reflow
+            void panel.offsetWidth; 
             panel.classList.add('fade-in');
 
             document.getElementById('info-desc').innerText = data.desc;
@@ -554,27 +508,23 @@
             });
         }
 
-        // Initialize state
         setSeason('summer');
 
-        // --- 6. Main Render Loop ---
+        // Animation Loop
         const clock = new THREE.Clock();
 
         function animate() {
             requestAnimationFrame(animate);
             const delta = clock.getDelta();
 
-            // Smooth Camera Interpolation
             currentCamPos.lerp(targetCamPos, 4 * delta);
             currentLookAt.lerp(targetLookAt, 4 * delta);
             camera.position.copy(currentCamPos);
             camera.lookAt(currentLookAt);
 
-            // Smooth Color Transitions
             materials.houseInterior.color.lerp(targetHouseColor, 2 * delta);
             materials.tankCore.emissive.lerp(targetTankColor, 2 * delta);
 
-            // Animate Active Particles
             const activeParticles = currentSeason === 'summer' ? particlesSummer : particlesWinter;
             activeParticles.forEach(p => {
                 p.progress += p.speed;
@@ -583,7 +533,6 @@
                 p.mesh.position.copy(p.curve.getPointAt(p.progress));
             });
 
-            // Gentle floating effect
             systemGroup.position.y = Math.sin(clock.getElapsedTime() * 0.5) * 0.1;
 
             renderer.render(scene, camera);
